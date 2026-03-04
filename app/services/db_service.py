@@ -172,4 +172,28 @@ class DBService:
                 } for i in result.scalars().all()
             ]
 
+    async def obtener_resultados_completos(self, id_lote: uuid.UUID) -> List[Dict]:
+        """
+        Devuelve toda la data extraída de los items del lote para n8n.
+        """
+        async with AsyncSessionLocal() as session:
+            stmt = select(ItemRif).where(ItemRif.id_lote == id_lote)
+            result = await session.execute(stmt)
+            items = result.scalars().all()
+            
+            return [
+                {
+                    "rif": i.rif_original,
+                    "global_id": i.global_id,
+                    "status": i.status_item,
+                    "nombre": i.nombre,
+                    "condicion": i.condicion,
+                    "actividad_economica": i.actividad_economica,
+                    "rif_corregido": i.rif_corregido,
+                    "error": i.error_extraccion
+                } for i in items
+            ]
+
+
+
 db_service = DBService()
