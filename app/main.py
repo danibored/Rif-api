@@ -2,6 +2,8 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder 
+from fastapi.middleware.cors import CORSMiddleware  # <-- IMPORTAR ESTO
+
 from app.api.v1.endpoints import router as api_v1_router
 from app.core.config import settings
 
@@ -11,18 +13,22 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ---  Contratos ---
-# Personalización de errores 
+# --- CONFIGURACIÓN DE CORS ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# --- MANEJADOR DE ERRORES ---
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    
-    # jsonable_encoder convierte los objetos de error de Python a tipos 
-    # serializables por JSON (como strings o dicts), evitando el error 500
     errors = jsonable_encoder(exc.errors())
-
-    # Se toma el primer error para mostrar un mensaje limpio
-    # loc[-1] nos dice el nombre del campo que falló (ej. "rif")
-    error_msg = f"Error en {errors[0]['loc'][-1]}: {errors[0]['msg']}"
+    # Manejo seguro de errores de validación
+    loc = errors[0]['loc'][-1] if errors[0]['loc'] else "desconocido"
+    error_msg = f"Error en {loc}: {errors[0]['msg']}"
     
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
@@ -42,5 +48,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    # En local usamos el puerto 8000
     uvicorn.run(app, host="0.0.0.0", port=8000)
