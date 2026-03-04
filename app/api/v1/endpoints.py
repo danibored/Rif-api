@@ -31,6 +31,7 @@ async def endpoint_validar(payload: BatchRequest, token: str = Depends(validate_
             "es_valido": (res.get("TIPO_DE_ERROR_DESPUES") == ""),
             "rif_corregido": res.get("RIF_CORREGIDO"),
             "error_antes": res.get("TIPO_DE_ERROR_ANTES"),
+            "detalle_error_antes": res.get("DETALLES_DEL_ERROR_ANTES"),
             "error_despues": res.get("TIPO_DE_ERROR_DESPUES")
         })
     
@@ -62,7 +63,7 @@ async def endpoint_consultar(id_lote: str, token: str = Depends(validate_api_key
         return status_data
     except ValueError:
         raise HTTPException(status_code=400, detail="ID de lote inválido")
-
+    
 # 4. REPORTE DE FALLIDOS (Para logs en n8n)
 @router.get("/consultar/{id_lote}/fallidos")
 async def endpoint_reporte_fallidos(id_lote: str, token: str = Depends(validate_api_key)):
@@ -72,6 +73,19 @@ async def endpoint_reporte_fallidos(id_lote: str, token: str = Depends(validate_
         return {"id_lote": id_lote, "total_fallidos": len(fallidos), "items": fallidos}
     except ValueError:
         raise HTTPException(status_code=400, detail="ID de lote inválido")
+
+# 5. --- CONSULTAR RESULTADOS ---
+
+@router.get("/consultar/{id_lote}/resultados", summary="Obtener datos extraídos")
+async def endpoint_resultados(id_lote: str, token: str = Depends(validate_api_key)):
+    """Devuelve toda la data extraída de los items del lote para n8n."""
+    try:
+        uuid_lote = uuid.UUID(id_lote)
+        resultados = await db_service.obtener_resultados_completos(uuid_lote)
+        return {"id_lote": id_lote, "total_items": len(resultados), "items": resultados}
+    except ValueError:
+        raise HTTPException(status_code=400, detail="ID de lote inválido")
+
 
 # --- MOTOR DE FONDO ---
 
