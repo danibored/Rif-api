@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+pandas
+httpx         
+tenacity
+beautifulsoup4
+sqlalchemy>=2.0
+asyncpg       

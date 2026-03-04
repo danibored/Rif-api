@@ -1,0 +1,9 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+postgres_data/
+n8n_data/
+.git/
+.gitignore

@@ -1,0 +1,36 @@
+# --- PYTHON / VENV ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+build/
+dist/
+
+# --- SECRETOS (¡MUY IMPORTANTE!) ---
+# No usar claves reales
+.env
+
+# --- DOCKER / BASE DE DATOS ---
+# Ignoramos las carpetas de datos de Postgres y n8n 
+# para no subir gigabytes de binarios de base de datos a GitHub
+postgres_data/
+n8n_data/
+
+# --- ARCHIVOS GENERADOS (Auditorías) ---
+# Ignoramos los archivos Excel que genera tu endpoint /validar
+*.xlsx
+*.xls
+*.csv
+
+# --- LOGS ---
+*.log
+logs/
+
+# --- OS / IDE ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
